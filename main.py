@@ -13,10 +13,22 @@ import re
 import sys
 import time
 from datetime import datetime
+
 from dotenv import load_dotenv
 from typing import Any
 
 load_dotenv()
+os.environ["PHOENIX_API_KEY"] = os.getenv("PHOENIX_API_KEY")
+
+
+# ===== ARIZE PHOENIX TRACING (added for observability) =====
+from phoenix.otel import register
+
+tracer_provider = register(
+    project_name="beliz-llm-eval-demo",
+    auto_instrument=True
+)
+# ===== END PHOENIX TRACING =====
 
 DEBUG_LOG_PATH = "/Users/belizsoyak/llm-eval-demo/.cursor/debug-d7a532.log"
 DEBUG_SESSION = "d7a532"
@@ -86,7 +98,7 @@ def chat_anthropic(messages: list[dict[str, str]], model: str) -> str:
         "max_tokens": max_tokens,
         "temperature": temperature,
         "messages": rest,
-        "thinking": ANTHROPIC_THINKING_DISABLED,
+        #"thinking": ANTHROPIC_THINKING_DISABLED,
     }
     if system:
         kwargs["system"] = system
